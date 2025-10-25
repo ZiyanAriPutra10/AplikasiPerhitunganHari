@@ -16,6 +16,60 @@ public class AplikasiPerhitunganHari extends javax.swing.JFrame {
         initComponents();
         setupEventListeners();
         
+        spinnerTahun.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                // Panggil metode untuk sinkronisasi
+                sinkronkanSpinnerKeCalendar(); 
+            }
+        });
+        
+        comboBulan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                // Panggil metode sinkronisasi yang SAMA
+                sinkronkanInputKeCalendar();
+            }
+        });
+    }
+    
+    private void sinkronkanSpinnerKeCalendar() {
+        try {
+            int tahun = (Integer) spinnerTahun.getValue();
+            int bulanIndex = comboBulan.getSelectedIndex() + 1;
+            
+            java.time.LocalDate tanggalDariInput = java.time.LocalDate.of(tahun, bulanIndex, 1);
+            
+            // Update JCalendar1
+            java.util.Date date = java.sql.Date.valueOf(tanggalDariInput);
+            jCalendar1.setDate(date);
+            
+        } catch (Exception e) {
+            // Tangani jika ada error, misal saat spinner diketik manual
+        }
+    }
+    
+    private void sinkronkanInputKeCalendar() {
+        try {
+            // 1. Ambil nilai TAHUN dari spinner
+            int tahun = (Integer) spinnerTahun.getValue();
+            
+            // 2. Ambil nilai BULAN dari combo box
+            // (+1 karena index JComboBox mulai dari 0, tapi bulan mulai dari 1)
+            int bulanIndex = comboBulan.getSelectedIndex() + 1; 
+            
+            // 3. Buat tanggal (selalu set ke tanggal 1)
+            java.time.LocalDate tanggalDariInput = java.time.LocalDate.of(tahun, bulanIndex, 1);
+            
+            // 4. Konversi ke java.util.Date (yang dibutuhkan JCalendar)
+            java.util.Date date = java.sql.Date.valueOf(tanggalDariInput);
+            
+            // 5. Atur tanggal di JCalendar1
+            jCalendar1.setDate(date);
+            
+        } catch (Exception e) {
+            // Tangani jika ada error, misalnya saat user mengetik
+            // tahun yang tidak valid di spinner.
+            // Kita bisa biarkan kosong agar tidak crash.
+        }
     }
 
     /**
